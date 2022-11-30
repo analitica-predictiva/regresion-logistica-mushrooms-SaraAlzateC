@@ -64,20 +64,20 @@ def pregunta_01():
     En esta función se realiza la carga de datos.
     """
     # Lea el archivo `mushrooms.csv` y asignelo al DataFrame `df`
-    df = pd.read_csv("mushrooms.csv", sep=",")
+    df = pd.read_csv("mushrooms.csv")
 
     # Remueva la columna `veil-type` del DataFrame `df`.
     # Esta columna tiene un valor constante y no sirve para la detección de hongos.
-    df.drop("veil-type")
+    df.drop("veil_type", inplace=True, axis=1)
 
     # Asigne la columna `type` a la variable `y`.
     y = df["type"]
 
     # Asigne una copia del dataframe `df` a la variable `X`.
-    X = pd.read_csv("veil-type.csv")
+    X = df.copy(deep=True)
 
     # Remueva la columna `type` del DataFrame `X`.
-    X.drop(["type"], inplace= True, axis=1)
+    X.drop("type", inplace= True, axis=1)
 
     # Retorne `X` y `y`
     return X, y
@@ -133,17 +133,16 @@ def pregunta_03():
     # LogisticRegression con una regularización Cs=10
     pipeline = Pipeline(
         steps=[
-            ("____", ____()),
-            ("____", ____(____)),
+            ("one_hot_encoder", OneHotEncoder()),
+            ("logistic_regression", LogisticRegressionCV(Cs=10)),
         ],
     )
 
     # Entrene el pipeline con los datos de entrenamiento.
-    ____.____(____, ____)
+    pipeline.fit(X_train, y_train)
 
     # Retorne el pipeline entrenado
     return pipeline
-
 
 def pregunta_04():
     """
@@ -151,7 +150,7 @@ def pregunta_04():
     """
 
     # Importe confusion_matrix
-    from ____ import ____
+    from sklearn import metrics
 
     # Obtenga el pipeline de la pregunta 3.
     pipeline = pregunta_03()
@@ -160,15 +159,18 @@ def pregunta_04():
     X_train, X_test, y_train, y_test = pregunta_02()
 
     # Evalúe el pipeline con los datos de entrenamiento usando la matriz de confusion.
-    cfm_train = ____(
-        y_true=____,
-        y_pred=____.____(____),
+    cfm_train = metrics.confusion_matrix(
+        y_true= y_train,
+        y_pred=pipeline.predict(X_train),
     )
 
-    cfm_test = ____(
-        y_true=____,
-        y_pred=____.____(____),
+    cfm_test = metrics.confusion_matrix(
+        y_true=y_test,
+        y_pred=pipeline.predict(y_test),
     )
 
     # Retorne la matriz de confusion de entrenamiento y prueba
     return cfm_train, cfm_test
+
+cfm_train, cfm_test = pregunta_04()
+print(cfm_train)
